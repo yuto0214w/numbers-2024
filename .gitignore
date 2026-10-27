@@ -3,7 +3,8 @@
 
 # frontend
 /web/node_modules
-/web/dist
+/web/dist/*
+!/web/dist/index.html
 
 # etc
 /BUILD_NUMBER.txt

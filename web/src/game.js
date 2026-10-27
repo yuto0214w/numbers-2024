@@ -323,15 +323,17 @@ window.addEventListener("DOMContentLoaded", async () => {
     /** @type {Side} */
     playerSide;
   if (authInfo) {
-    ({ privateId, publicId, playerSide } = JSON.parse(authInfo));
+    let name;
+    ({ privateId, publicId, playerSide, name } = JSON.parse(authInfo));
+    isAuthorized = true;
+    players[playerSide].set(publicId, {
+      name,
+      selecting_piece: null,
+      is_inactive: false,
+    });
     sender.authorize(privateId);
+    heartbeat.start();
   }
-  function redraw() {
-    drawObj.adjustCanvas();
-    drawObj.drawAll();
-  }
-  window.addEventListener("resize", redraw);
-  redraw();
   let previousX = -1,
     previousY = -1,
     isMovePieceMode = false;
@@ -366,6 +368,12 @@ window.addEventListener("DOMContentLoaded", async () => {
       textBaseline: "middle",
     });
   });
+  function redraw() {
+    drawObj.adjustCanvas();
+    drawObj.drawAll();
+  }
+  window.addEventListener("resize", redraw);
+  redraw();
   window.addEventListener("mouseup", async function f(e) {
     if (!isAuthorized) {
       let side;
@@ -400,7 +408,6 @@ window.addEventListener("DOMContentLoaded", async () => {
       const res = await (await fetch(normalizedPath + "/join_" + side)).json();
       if (res.success) {
         isAuthorized = true;
-        drawObj.drawAll();
         privateId = res.private_id;
         publicId = res.public_id;
         playerSide = res.side;
@@ -410,10 +417,12 @@ window.addEventListener("DOMContentLoaded", async () => {
             JSON.stringify({
               privateId,
               publicId,
+              playerSide,
+              name: res.name,
             })
           );
         }
-        players[side].set(publicId, {
+        players[playerSide].set(publicId, {
           name: res.name,
           selecting_piece: null,
           is_inactive: false,

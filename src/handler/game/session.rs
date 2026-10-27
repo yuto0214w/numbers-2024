@@ -225,9 +225,9 @@ impl GameSession {
     where
         T: Into<String>,
     {
-        if self.get_player_data(side).len() >= self.config.team_player_limit {
+        /*if self.get_player_data(side).len() >= self.config.team_player_limit {
             return None;
-        }
+        }*/
         let private_id = Uuid::new_v4();
         let public_id = Uuid::new_v4();
         let name = name.into();
